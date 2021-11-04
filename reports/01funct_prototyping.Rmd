@@ -153,6 +153,8 @@ kerli_datime_n_lat_lon <- case_Kerli %>% select(DATETIME, LAT, LON)
 
  >>find the observation when it sailed the longest distance between two consecutive observations.
 
+##### Function creation
+
 ```{r keyFunctions4Task}
 library(sf)
 #library(furrr)
@@ -187,16 +189,20 @@ func_distance <- function(from, to) {
 
 #calculate a new tibble after applied function
 calc_circle_distance <- function(spatial_df) {
+  
   if (class(spatial_df)[1] != "sf") {
     print("not an sf object. Lat and lon features must be encoded as geometries in an sf object.")
     
   } else{
-    lagged_df <- spatial_df %>%
-      lag()
+    
+    #grab the observation after the current one
+    lead_df <- spatial_df %>% lead()
     
     df_distances <- tibble(
-      DATETIME = spatial_df$DATETIME,
-      distance_travelled =  func_distance(from = spatial_df, to = lagged_df)
+      datetime_from = spatial_df$DATETIME,
+      datetime_to = lead_df$DATETIME,
+      #calculate the distance between poit A from to point B to
+      distance_travelled =  func_distance(from = spatial_df, to = lead_df)
     )
     
     return(df_distances)
@@ -207,11 +213,12 @@ calc_circle_distance <- function(spatial_df) {
 #CHECK it receives a spatial df and
 
 get_max_distance <- function(df_distances) {
-  if (colnames(df_distances)[2] != "distance_travelled") {
+  if (colnames(df_distances)[3] != "distance_travelled") {
     print("Column needed for operation missing. `distance travelled` is needed")
     
   } else{
     top_distance <- df_distances  %>%
+      #HOW TO PROTECT AGAINST SAME DISTANCE AND GRAB THE MOST RECENT?
       slice_max(order_by = distance_travelled)
     
     return(top_distance)
@@ -223,35 +230,41 @@ obtain_record_of_top_distance <- function(df, top_distance){
 record_top_distance_points <- tibble(
   
   df %>% 
-    filter(DATETIME == top_distance$DATETIME)
-  ) %>%
-      st_as_sf(.,
-               coords = c("LON", "LAT"),
-               crs = 4326)
+    filter(DATETIME == top_distance$datetime_from |
+             DATETIME == top_distance$datetime_to)
+  ) 
   
   return(record_top_distance_points)
 }
+
+#CHECK RETURNS ONLY 2 VALUES
 ```
+
+##### test env
 
 ```{r testEnv}
 sf_kerli <- sf::st_as_sf(kerli_datime_n_lat_lon, coords = c("LON", "LAT"),
                          crs = 4326) # to get the units in meters
 
-lagged_kerli <- sf_kerli %>% arrange(DATETIME) %>% lag()
+lead_kerli <- sf_kerli %>% arrange(DATETIME) %>% lead()
 
 # set up parraller processing
 #plan(multisession, workers = 2) #my windows laptop only has 2 corsd
 
 tic(msg = "sf simple calculation")
 kerli_distances <- tibble(
-  DATETIME = sf_kerli$DATETIME,
-  distance_travelled =  func_distance(from = sf_kerli, to = lagged_kerli) # if TRUE, return a vector with distance between the first elements of x and y
+  datetime_from = sf_kerli$DATETIME,
+  datetime_to = lead_kerli$DATETIME,
+  distance_travelled =  func_distance(from = sf_kerli, to = lead_kerli) # if TRUE, return a vector with distance between the first elements of x and y
 ) %>% 
+  group_by(datetime_from, distance_travelled) %>% 
   slice_max(order_by = distance_travelled)
   #arrange(desc(distance_travelled), DATETIME)
 toc()
 
 ```
+
+##### full calculation
 
 ```{r applyfullcalculation}
 tic(msg = "sf integrated calculation")
@@ -285,12 +298,40 @@ toc()
 ```{r mapviewSample}
 library(mapview)
 
-mapview(top_record_kerli_distance)
+mapview(top_record_kerli_distance %>% select(ShipName, ShipType))
 ```
 
 
 
-## Plot results
+## Plot results in leaflet
+
+```{r leaftletmap}
+library(leaflet)
+
+plot_df <- top_record_kerli_distance %>% 
+  arrange(DATETIME) %>% 
+  mutate(
+    position = c("Point A", "Point B")
+  )
+
+leaflet(data = plot_df) %>% addTiles() %>%
+  addMarkers(~LON, ~LAT,
+             #message to be displayed on click
+             popup = ~paste(sep = "<br/>",
+                                    ShipName,
+DATETIME,
+position),
+             #to display a text label either on hover or statically
+             label = ~as.character(position),
+labelOptions = labelOptions(noHide = T,
+                            textsize = "15px"))
+%>% 
+  addPopups("Hellow",
+    options = popupOptions(closeButton = FALSE)
+  )
+
+```
+
 
 ## Mock answer
 
