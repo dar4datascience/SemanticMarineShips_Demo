@@ -293,14 +293,6 @@ toc()
 toc()
 ```
 
-##### see some points in the map
-
-```{r mapviewSample}
-library(mapview)
-
-mapview(top_record_kerli_distance %>% select(ShipName, ShipType))
-```
-
 
 
 ## Plot results in leaflet
@@ -319,16 +311,16 @@ leaflet(data = plot_df) %>% addTiles() %>%
              #message to be displayed on click
              popup = ~paste(sep = "<br/>",
                                     ShipName,
+                            ShipType,
 DATETIME,
 position),
              #to display a text label either on hover or statically
              label = ~as.character(position),
 labelOptions = labelOptions(noHide = T,
-                            textsize = "15px"))
-%>% 
-  addPopups("Hellow",
-    options = popupOptions(closeButton = FALSE)
-  )
+                            textsize = "15px")) %>%
+  addMiniMap() %>% 
+  addPolylines(~LON, ~LAT,)
+
 
 ```
 
