@@ -1,0 +1,306 @@
+---
+title: "01Protyping_functions"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE
+)
+library(data.table)
+library(dtplyr)
+library(dplyr, warn.conflicts = FALSE)
+library(tictoc)
+
+here::i_am("reports/01funct_prototyping.Rmd")
+```
+
+## Load data
+
+```{r loadData}
+tic(msg = "load and guess")
+df_ships <- fread(
+  here::here("data", "clean_ships.csv"),
+                         encoding = "UTF-8"
+)
+toc()
+
+tic(msg = "load and specify")
+
+df_ships <- fread(
+  here::here("data", "clean_ships.csv"),
+  encoding = "UTF-8",
+  sep = ",",
+  header = TRUE
+)
+
+toc()
+
+#dont make a copy of the df when calling mutate
+lazy_df_ships <- lazy_dt(df_ships, immutable = FALSE)
+```
+
+Better to specify than not specify
+
+## Make test data
+
+```{r testData}
+sample_ship_t_n <-
+  lazy_df_ships %>% 
+  select(ShipName, ShipType) %>% 
+  distinct() %>%
+  as_tibble() %>% 
+  sample_frac(0.25) 
+```
+
+
+## Unique vessel types and names
+
+Considering there are only 9 vessel types, this information can be extracted and created on the spot instead of querying distinct() from the loaded df. 
+
+I will also extract unique vessel names to [**mock a coocked answer for the app**](#Mock answer), so the only loading time of the app would be over the loading of the big csv and shiny dependencies and not burden with these calculations.
+
+```{r uniqueVessel}
+
+Vessel_types_n_names <- lazy_df_ships %>%
+  select(ShipType,ShipName) %>% 
+  distinct() %>%
+  as_tibble()
+
+```
+
+
+## Vessel filtering
+
+```{r filterVesselbyType}
+
+filter_vessel_type <- function(df, vessel_type){
+  
+  filtered_df <- df %>% 
+    filter(.data[['ShipType']] == vessel_type)
+  
+  return(filtered_df)
+}
+
+tic(msg = "begin filtering")
+check_filter_df <- filter_vessel_type(lazy_df_ships, sample_ship_t_n$ShipType[4]) %>%  #Fishing 
+  as_tibble()
+toc()
+```
+
+```{r getShipNames}
+get_ship_names <- function(df, vessel_type){
+    vessel_names <- df %>% 
+    filter(.data[['ShipType']] == vessel_type) %>% 
+    select(.data[['ShipName']]) %>% 
+    distinct() %>% 
+    as_tibble()
+    
+    return(vessel_names)
+}
+
+get_ship_names(Vessel_types_n_names, sample_ship_t_n$ShipType[4])
+
+```
+
+```{r filterbyShipName}
+filter_vessel_name <- function(df, vessel_name){
+  
+  filtered_df <- df %>% 
+    filter(.data[['ShipName']] == vessel_name)
+  
+  return(filtered_df)
+}
+
+check_filter_name_df <- filter_vessel_name(lazy_df_ships, "KERLI - 3338") %>% 
+  as_tibble()
+```
+
+
+Test filtered df contains same amount of columns
+
+Test expect distinct(ShipType, ShipName) has `r nrow(Vessel_types_n_names)` rows (1,226).
+
+Test some expected answers that were precalculated regarding
+distinct() combinations of `ShipType` and `ShipName`
+
+### On selector
+
+### Selecting the longest route given 2 points
+
+```{r caseSelect}
+
+#arrange data by DATETIME then perform rolling/window calculation
+
+case_Kerli <- filter_vessel_name(lazy_df_ships, "KERLI - 3338") %>% 
+  arrange(DATETIME) %>% 
+  as_tibble()
+
+kerli_datime_n_lat_lon <- case_Kerli %>% select(DATETIME, LAT, LON)
+```
+
+### What distance is calculated?
+
+#### Great Circle
+
+[Great circle distances](https://www.r-bloggers.com/2020/02/three-ways-to-calculate-distances-in-r/)
+
+ >>find the observation when it sailed the longest distance between two consecutive observations.
+
+```{r keyFunctions4Task}
+library(sf)
+#library(furrr)
+
+# https://r-spatial.github.io/sf/reference/geos_measures.html: great circle distance calculations use by default spherical distances
+
+#transform data to spatial df to perform operations
+transform_to_spatial_df <- function(df) {
+  if (class(df)[1] != "tbl_df") {
+    print("object is not of class tbl_df. please make your df a tibble")
+    
+  } else{
+    spatial_df <- df %>%
+      select(DATETIME, .data[['LAT']], .data[['LON']]) %>%
+      st_as_sf(.,
+               coords = c("LON", "LAT"),
+               crs = 4326) %>%
+      arrange(DATETIME)
+    
+    return(spatial_df)
+  }
+}
+
+#CHECK its a spatial df wth crs 4326
+
+#function distace to use
+func_distance <- function(from, to) {
+  st_distance(from, to, by_element = TRUE)
+}
+
+#check it returns a vector ad that from and to have geometry and crs 4326
+
+#calculate a new tibble after applied function
+calc_circle_distance <- function(spatial_df) {
+  if (class(spatial_df)[1] != "sf") {
+    print("not an sf object. Lat and lon features must be encoded as geometries in an sf object.")
+    
+  } else{
+    lagged_df <- spatial_df %>%
+      lag()
+    
+    df_distances <- tibble(
+      DATETIME = spatial_df$DATETIME,
+      distance_travelled =  func_distance(from = spatial_df, to = lagged_df)
+    )
+    
+    return(df_distances)
+  }
+  
+}
+
+#CHECK it receives a spatial df and
+
+get_max_distance <- function(df_distances) {
+  if (colnames(df_distances)[2] != "distance_travelled") {
+    print("Column needed for operation missing. `distance travelled` is needed")
+    
+  } else{
+    top_distance <- df_distances  %>%
+      slice_max(order_by = distance_travelled)
+    
+    return(top_distance)
+  }
+}
+
+obtain_record_of_top_distance <- function(df, top_distance){
+  
+record_top_distance_points <- tibble(
+  
+  df %>% 
+    filter(DATETIME == top_distance$DATETIME)
+  ) %>%
+      st_as_sf(.,
+               coords = c("LON", "LAT"),
+               crs = 4326)
+  
+  return(record_top_distance_points)
+}
+```
+
+```{r testEnv}
+sf_kerli <- sf::st_as_sf(kerli_datime_n_lat_lon, coords = c("LON", "LAT"),
+                         crs = 4326) # to get the units in meters
+
+lagged_kerli <- sf_kerli %>% arrange(DATETIME) %>% lag()
+
+# set up parraller processing
+#plan(multisession, workers = 2) #my windows laptop only has 2 corsd
+
+tic(msg = "sf simple calculation")
+kerli_distances <- tibble(
+  DATETIME = sf_kerli$DATETIME,
+  distance_travelled =  func_distance(from = sf_kerli, to = lagged_kerli) # if TRUE, return a vector with distance between the first elements of x and y
+) %>% 
+  slice_max(order_by = distance_travelled)
+  #arrange(desc(distance_travelled), DATETIME)
+toc()
+
+```
+
+```{r applyfullcalculation}
+tic(msg = "sf integrated calculation")
+tic("transform_to_spatial_df")
+spatial_kerli <- transform_to_spatial_df(case_Kerli)
+toc()
+tic("calc_circle_distance")
+distances_kerli <- calc_circle_distance(spatial_kerli)
+toc()
+tic("get max distance travelled")
+top_kerli_distance <- get_max_distance(distances_kerli)
+toc()
+toc()
+
+
+tic(msg = "sf integrated calculation as a pipe")
+tic(msg = "pipe 2 get the answer")
+top_distance_kerli <- case_Kerli %>% 
+ transform_to_spatial_df(.) %>% 
+  calc_circle_distance(.) %>% 
+  get_max_distance(.)
+toc()
+tic(msg = "obtain record that belong to that datetime")
+top_record_kerli_distance <- obtain_record_of_top_distance(case_Kerli, top_distance_kerli)
+toc()
+toc()
+```
+
+##### see some points in the map
+
+```{r mapviewSample}
+library(mapview)
+
+mapview(top_record_kerli_distance)
+```
+
+
+
+## Plot results
+
+## Mock answer
+
+The preloaded configuration of the app will be:
+
+  - Vessel type: High Special - 4
+  - Vessen name: POLIS 593790-323857
+  
+```{r coockedCalculation}
+
+```
+
+

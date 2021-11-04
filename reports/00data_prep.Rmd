@@ -1,0 +1,165 @@
+---
+title: "Marine data prep"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	cache = TRUE
+)
+library(dplyr)
+library(glue)
+here::i_am("reports/00data_prep.Rmd")
+ships <- readr::read_csv(here::here("data","ships.csv"))
+```
+
+
+## Objective of data prep
+
+There is half a GB of information in `ships.csv` with multiple columns. The reasons for this data prep are:
+
+1. combine the `SHIP_ID` column and the `SHIPNAME` column to add in the ship selector dropdown the possibilty to type the ship you are looking for with either the ID or the shipname.
+
+2. make the file smaller by only grabbin the data that it is going to be in the app. The variables are: 
+
+  - [x] `LAT` !!!
+  - [x] `LON` !!!
+  - [x] `SPEED`
+  - [x] `DESTINATION`: is name of place
+  - [x] `FLAG`
+  - [x] `SHIPNAME` !!!
+  - [x] `SHIP_ID`  !!!
+  - [x] `SHIPTYPE` !!! .... is `ship_type` == `SHIPTYPE`? explore...
+  - [x] `DATETIME`: minutes are very important
+  - [x] `week_nb`
+  - [x] `port`: is name of port. `PORT` is the same as `port` but the ladder is better suitable for data presentation
+  - [x] `is_parked`
+
+3. Finally do a quick load check between using `data.table` and `arrow`. For these will help the app load and do calcultions faster.
+
+!!!: are essential for performing the basic tasks in the home assignment.
+
+## Select columns
+
+```{r selectCols}
+
+key_vars_ship <- ships %>% 
+  select(
+    SHIP_ID,
+    SHIPNAME,
+    SHIPTYPE,
+    ship_type,
+    FLAG,
+    DESTINATION, 
+    port,
+    SPEED,
+    is_parked,
+    DATETIME,
+    week_nb,
+    LAT,
+    LON
+  )
+  
+  
+```
+
+
+
+## About combining columns
+
+After checking `ship_type` and `SHIPTYPE`, one is a character variable whereas the second is numerical variable. So i am going to combine these two too.
+
+### combine ship type columns and ship name columns
+
+```{r combineShiptypesAndnames}
+
+clean_ship_selectors <- key_vars_ship %>%
+  mutate(
+    clean_ship_types = paste(ship_type, "-", SHIPTYPE),
+    clean_ship_names = paste(SHIPNAME, "-", SHIP_ID)
+  ) %>%
+  select(
+    clean_ship_names,
+    clean_ship_types,
+    FLAG,
+    DESTINATION,
+    port,
+    is_parked,
+    DATETIME,
+    week_nb,
+    LAT,
+    LON,
+    !c(ship_type, SHIPTYPE, SHIPNAME, SHIP_ID)
+  ) %>%
+  relocate(clean_ship_names, clean_ship_types, .before = FLAG)
+
+```
+
+
+
+
+
+## Clean column names
+
+```{r clean_columns}
+
+clean_ship_data <- clean_ship_selectors %>% 
+  rename(
+    "ShipName" = clean_ship_names,
+    "ShipType" =  clean_ship_types,
+    "week_of_year" = week_nb
+  )
+  
+  
+  
+```
+
+
+## Write new csv
+
+```{r writecsv}
+
+data.table::fwrite(clean_ship_data,
+                   here::here("data", 
+                              "clean_ships.csv"),
+                   bom = TRUE)
+```
+
+
+## Test load times
+
+```{r loadtime}
+library(data.table)
+library(arrow)
+
+tictoc::tic(msg = "load with data.table")
+
+datatable_ships <- fread(here::here("data", "clean_ships.csv"),
+                         encoding = "UTF-8")
+tictoc::toc()
+
+
+tictoc::tic(msg = "load with arrow")
+
+arrow_ships <- read_csv_arrow(here::here("data", "clean_ships.csv"))
+tictoc::toc()
+
+```
+
+
+
+## Conclusion
+
+9 columns were removed and columns were resorted, transformed, and renamed.
+
+The clean dataframe has `r ncol(clean_ship_selectors)` columns and the same number of data points: `r nrow(clean_ship_selectors)`.
+
+The data prep cut down the size of the csv from ~398.1MB to ~309.4MB. Data was reduced to `r 309.* 100 / 398.1` % of the original size.
+
+For this demo, I am going to suppose I must use a csv file and cannot use any other file type. Thus, `data.table` will allow a faster load time
