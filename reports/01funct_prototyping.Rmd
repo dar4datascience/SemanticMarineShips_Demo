@@ -73,6 +73,10 @@ Vessel_types_n_names <- lazy_df_ships %>%
   distinct() %>%
   as_tibble()
 
+fwrite(Vessel_types_n_names, 
+       here::here("data", "ship_types_n_names.csv"),
+       bom = TRUE)
+
 ```
 
 
@@ -105,7 +109,7 @@ get_ship_names <- function(df, vessel_type){
     return(vessel_names)
 }
 
-get_ship_names(Vessel_types_n_names, sample_ship_t_n$ShipType[4])
+ship_names <- get_ship_names(Vessel_types_n_names, sample_ship_t_n$ShipType[4])
 
 ```
 
@@ -319,7 +323,10 @@ position),
 labelOptions = labelOptions(noHide = T,
                             textsize = "15px")) %>%
   addMiniMap() %>% 
-  addPolylines(~LON, ~LAT,)
+  addPolylines(~LON, ~LAT,
+               label = ~paste(sep = " ", "Distance travelled:", prettyNum(top_distance_kerli$distance_travelled, big.mark = ","),
+                              "meters")
+               )
 
 
 ```
