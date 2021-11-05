@@ -1,5 +1,5 @@
 # load libraries ----
-library(shinyWidgets)
+
 library(shiny)
 library(sf)
 library(dtplyr)

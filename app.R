@@ -13,6 +13,9 @@ source("r/func_2_calc_distances.R")
 source("r/func_get_max_distance.R")
 source("r/func_get_record_of_top_distance.R")
 source("r/func_create_map.R")
+# source modules
+source('r/mod-dropdowns.R')
+source('r/mod-leafletmap.R')
 
 
 # Create useful variables -------------------------------------------------

@@ -4,7 +4,7 @@
 #' as a tibble for calculations and mapping
 
 # load libraries ----
-library(shinyWidgets)
+
 library(shiny)
 library(dplyr)
 library(dtplyr)
