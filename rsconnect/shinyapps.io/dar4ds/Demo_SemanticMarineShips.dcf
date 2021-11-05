@@ -5,10 +5,10 @@ account: dar4ds
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5049818
-bundleId: 5219469
+bundleId: 5219475
 url: https://dar4ds.shinyapps.io/Demo_SemanticMarineShips/
-when: 1636153626.77518
-lastSyncTime: 1636153626.77518
+when: 1636153743.13654
+lastSyncTime: 1636153743.13654
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .Rbuildignore|.Rprofile|data/.gitignore|data/clean_ships.zip|project_snapshots/prototype01.jpg|project_snapshots/prototype02.jpg|README.md|reports|test_environment|tests
+ignoredFiles: .Rbuildignore|.Rprofile|data/.gitignore|data/clean_ships.zip|project_snapshots/prototype01.jpg|project_snapshots/prototype02.jpg|README.md|reports|test_environment

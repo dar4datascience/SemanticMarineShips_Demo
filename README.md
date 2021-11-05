@@ -12,6 +12,12 @@ A demo app made with shiny.semantic with fictional boat route data.
 
 When doing a git clone dont forget to unzip the compress csv so the app loads correctly.
 
+
+## Version 2 of app
+
+![second prototype of port app](https://github.com/dar4datascience/SemanticMarineShips_Demo/blob/main/project_snapshots/prototype02.jpg)
+
+
 ## Version 1 of app
 
 ![first prototype of port app](https://github.com/dar4datascience/SemanticMarineShips_Demo/blob/main/project_snapshots/prototype01.jpg)
