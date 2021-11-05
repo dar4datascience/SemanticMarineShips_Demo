@@ -1,4 +1,4 @@
-source("R/func_load_ship_nameS_n_types.R")
+source("r/func_load_ship_nameS_n_types.R")
 library(testthat)
 
 test_that("ship names and types is loaded correctly", {

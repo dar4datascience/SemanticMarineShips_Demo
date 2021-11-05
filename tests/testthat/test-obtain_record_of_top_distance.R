@@ -1,9 +1,9 @@
-source("R/func_load_data.R")
-source("R/func_filter_vessel_name.R")
-source("R/func_2_spatial_df.R")
-source("R/func_2_calc_distances.R")
-source("R/func_get_max_distance.R")
-source("R/func_get_record_of_top_distance.R")
+source("r/func_load_data.R")
+source("r/func_filter_vessel_name.R")
+source("r/func_2_spatial_df.R")
+source("r/func_2_calc_distances.R")
+source("r/func_get_max_distance.R")
+source("r/func_get_record_of_top_distance.R")
 library(testthat)
 
 test_that("2 records relating to max distance are returned", {

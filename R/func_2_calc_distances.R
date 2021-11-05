@@ -1,6 +1,6 @@
 #function distace to use
 func_distance <- function(from, to) {
-  st_distance(from, to, by_element = TRUE)
+  sf::st_distance(from, to, by_element = TRUE)
 }
 
 #calculate a new tibble after applied function

@@ -1,5 +1,5 @@
-source("R/func_load_data.R")
-source("R/func_filter_vessel_name.R")
+source("r/func_load_data.R")
+source("r/func_filter_vessel_name.R")
 library(testthat)
 
 test_that("filtering of ship data works", {

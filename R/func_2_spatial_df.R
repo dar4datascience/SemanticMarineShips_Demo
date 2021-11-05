@@ -6,7 +6,7 @@ transform_to_spatial_df <- function(df) {
   } else{
     spatial_df <- df %>%
       select(DATETIME, .data[['LAT']], .data[['LON']]) %>%
-      st_as_sf(.,
+      sf::st_as_sf(.,
                coords = c("LON", "LAT"),
                crs = 4326) %>%
       arrange(DATETIME)
