@@ -1,24 +1,33 @@
 
 # Call tools needed for app -----------------------------------------------
-
+library(dtplyr)
+library(dplyr)
+library(shiny)
+library(shiny.semantic)
 
 
 
 # Create useful variables -------------------------------------------------
 
 
-
-library(shiny)
-
 # Define UI for application that draws a histogram
 ui <- semanticPage(
 
   title = "Semantic Marine Ships",
   h1("Port movements analyzer"),
+
+# main panel begins -------------------------------------------------------
+
     main_panel(
+
+# begin of selectors segment: row 1 ----------------------------------------------
+
       segment(
         ship_dropdowns_UI("conditional_dropdowns")
-      ),
+      ), #end of selectors segment
+
+# row 2 -------------------------------------------------------------------
+
       segment(
         cards(
           class = "two",
@@ -37,11 +46,7 @@ ui <- semanticPage(
                )
           )
         )
-      ),
-      grid(grid_charts,
-           chart1 = plotOutput("histogram"),
-           chart2 = plotOutput("plot")
-      )
+      ) # end of cards segment
     ) # end of main panel
 )
 
@@ -54,14 +59,7 @@ server <- function(input, output) {
 
   ship_dropdowns_server("conditional_dropdowns")
   
-    output$distPlot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white')
-    })
+  
 }
 
 # Run the application 

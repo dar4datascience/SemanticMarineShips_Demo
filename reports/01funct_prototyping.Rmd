@@ -330,6 +330,15 @@ labelOptions = labelOptions(noHide = T,
 
 
 ```
+### full calculation starting from a filtered df
+
+```{r fullmapcalc}
+source("R/func_create_map.R")
+
+tic()
+create_distance_map_between_a_n_b(case_Kerli)
+toc()
+```
 
 
 ## Mock answer
