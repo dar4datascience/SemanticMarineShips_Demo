@@ -4,6 +4,10 @@ Demo_SemanticMarineShips <img src='man/figures/logo.jpg' align="right" height="1
 
 A demo app made with shiny.semantic with fictional boat route data.
 
-## Version 1
+## Demo deployment
+
+[LIVE link](https://dar4ds.shinyapps.io/Demo_SemanticMarineShips/) to the app in shinyapps.io
+
+## Version 1 of app
 
 ![first prototype of port app](https://github.com/dar4datascience/SemanticMarineShips_Demo/blob/main/project_snapshots/prototype01.jpg)
