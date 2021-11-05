@@ -1,6 +1,7 @@
 
-# Call tools needed for app -----------------------------------------------
+# Call tools needed for shinyapp.io -----------------------------------------------
 library(shiny)
+library(here) # path referenceer
 library(sf)
 library(dtplyr)
 library(dplyr)
