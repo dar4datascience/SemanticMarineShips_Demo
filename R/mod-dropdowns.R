@@ -46,8 +46,11 @@ grid_selectors <- grid_template(default = list(
 ship_dropdowns_UI <- function(id) {
   ns <- NS(id)
   tagList(
-    tags$h3("Select the Ship you wish to know its maximum consecutive distance:"),
     
+    div(class = "ui top left attached header",
+        
+    tags$h3("Select the Ship you wish to know its maximum consecutive distance:"),
+    ),
     # declare grid ------------------------------------------------------------
     grid(
       grid_selectors,
