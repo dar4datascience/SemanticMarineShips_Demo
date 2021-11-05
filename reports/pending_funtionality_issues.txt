@@ -1,6 +1,8 @@
-## Notes about app functionality
+## Notes about app 
 
  - vessel name selector does not dropdown at the beginning. Might be still loading?
  - use the box package for better function management
  - create more tests from shinytests
  - map doesnt display well in mobile, but minimap does. perhaps call base tile of world data
+ - TESTs are weak and calling of functions maybe unneccesary
+ - package the app as a package

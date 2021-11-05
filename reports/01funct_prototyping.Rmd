@@ -341,15 +341,4 @@ toc()
 ```
 
 
-## Mock answer
-
-The preloaded configuration of the app will be:
-
-  - Vessel type: High Special - 4
-  - Vessen name: POLIS 593790-323857
-  
-```{r coockedCalculation}
-
-```
-
 

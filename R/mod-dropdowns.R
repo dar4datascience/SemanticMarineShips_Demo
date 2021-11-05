@@ -127,9 +127,7 @@ observe({
                                                                      isolate(
                                                                        input$vesselSelect
                                                                      )
-                                ) %>% 
-                                  arrange(DATETIME) %>% 
-                                  as_tibble()
+                                )
                                 
                                 
                               })
