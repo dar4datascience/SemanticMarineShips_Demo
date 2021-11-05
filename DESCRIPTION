@@ -17,4 +17,6 @@ Imports:
     leaflet,
     sf,
     shiny,
-    shiny.semantic
+    shiny.semantic,
+    shinycssloaders,
+    waiter

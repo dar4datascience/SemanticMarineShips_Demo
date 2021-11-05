@@ -8,6 +8,10 @@ A demo app made with shiny.semantic with fictional boat route data.
 
 [LIVE link](https://dar4ds.shinyapps.io/Demo_SemanticMarineShips/) to the app in shinyapps.io
 
+## On git clones
+
+When doing a git clone dont forget to unzip the compress csv so the app loads correctly.
+
 ## Version 1 of app
 
 ![first prototype of port app](https://github.com/dar4datascience/SemanticMarineShips_Demo/blob/main/project_snapshots/prototype01.jpg)
