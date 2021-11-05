@@ -3,6 +3,8 @@
 library(shiny)
 library(here) # path referenceer
 library(sf)
+library(waiter)
+library(shinycssloaders)
 library(dtplyr)
 library(dplyr)
 library(leaflet)
@@ -30,6 +32,12 @@ grid_main_app <- grid_template(default = list(
 
 # Define UI for application that draws a histogram
 ui <- semanticPage(
+
+# add loading elements ----------------------------------------------------
+useWaiter(),
+waiterPreloader(html = spin_gauge()),  
+#autoWaiter(id = "reactive_leaflet_map",
+ #          html = spin_terminal()),
 
   title = "Semantic Marine Ships",
   h1("Port movements analyzer"),
@@ -67,10 +75,14 @@ ui <- semanticPage(
       ), # end of cards segment
   segment(
     class = "basic",
-    tags$a(class = "ui blue right ribbon label right",
+   tags$a(class = "ui blue right ribbon label right",
            href = "https://www.marinetraffic.com/blog/information-transmitted-via-ais-signal/",
            "Find my ship"),
-    leaflet::leafletOutput("reactive_leaflet_map")
+    leaflet::leafletOutput("reactive_leaflet_map") %>% 
+     shinycssloaders::withSpinner(.,
+                                  type = 1,
+                                  color = "#A20EF2",
+                                  size = 3)
   )
     ) # end of main panel
 )

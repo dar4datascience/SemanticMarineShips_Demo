@@ -8,3 +8,4 @@
  - TESTs are weak and calling of functions maybe unneccesary
  - package the app as a package 
  - is projection correct on the leaftlet? some observations appear on land, maybe the boat is on repairs
+ - weird second loader on preloader at first start app
