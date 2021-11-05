@@ -10,6 +10,7 @@ library(dplyr)
 library(leaflet)
 library(shiny.semantic)
 
+options(semantic.themes = TRUE)
 
 #wrap to make a package
 
@@ -17,7 +18,8 @@ library(shiny.semantic)
 #' @description main function call that servers run_app.R
 #' @export
 SemanticMarineShips <- function(...) {
-
+  
+  
 # Create useful variables -------------------------------------------------
 #* gridTemplate ------------------------------------------------------------
 
@@ -34,11 +36,18 @@ ui <- semanticPage(
 
 # add loading elements ----------------------------------------------------
 useWaiter(),
-waiterPreloader(html = spin_gauge()),  
+waiterPreloader(html = spin_gauge()),
+autoWaiter(id = c("vesselname",
+                  "parking_status"
+                  ),
+           html = spin_refresh()
+           ),  
 #autoWaiter(id = "reactive_leaflet_map",
  #          html = spin_terminal()),
 
   title = "Semantic Marine Ships",
+  theme = "cosmo", #doesnt change anything
+
   # main panel begins -------------------------------------------------------
 
     main_panel(
@@ -87,22 +96,38 @@ segment(
              )# end of h2
              ) # end of div content
          ), # end of card
+
+# first value box ---------------------------------------------------------
+
+    
     card(class = "red",
          div(class = "content",
              div(class = "header", "Vessel Report"),
              div(class = "meta",
                  textOutput("vesselname")),
              div(class = "description",
-                 textOutput("ship_status"))
+                 textOutput("vesselflag"),
+                 textOutput("distancetravelled"),
+                 textOutput("destination"),
+                 textOutput("port"),
+                 textOutput("startdate"),
+                 textOutput("endingdate")
+                 )
          )
     ),
+
+# second value box --------------------------------------------------------
+
     card(class = "blue",
          div(class = "content",
              div(class = "header", "Is the Vessel parked?"),
              div(class = "description", 
-                 textOutput("parking_status")),
-             div(class = "meta",
-                 "More detail description card 2")
+                 textOutput("parking_status"),
+                 textOutput("weekofyear"),
+                 textOutput("movefromcoords"),
+                 textOutput("movetocoords"),
+                 textOutput("speed")
+                 )
          )
     )
   )
@@ -140,8 +165,8 @@ server <- function(input, output) {
       get_max_distance(.)
     
     
-    print("top distance operations")
-    print(top_distance_operations$top_distance_df)
+    #print("top distance operations")
+    #print(top_distance_operations$top_distance_df)
     
     # obtain the records associated to max distance ------------------------------------------------------------------
     
@@ -150,8 +175,8 @@ server <- function(input, output) {
                                     top_distance_operations$top_distance_df)
     
     
-    print("top distance df")
-    print(top_distance_operations$top_record_df_distance)
+    #print("top distance df")
+    #print(top_distance_operations$top_record_df_distance)
     
     # add point reference -----------------------------------------------------
     
@@ -162,8 +187,8 @@ server <- function(input, output) {
       )
     
     
-    print("plot df")
-    print(top_distance_operations$plot_df)
+    #print("plot df")
+    #print(top_distance_operations$plot_df)
     
     # plot map ----------------------------------------------------------------
     
@@ -185,59 +210,185 @@ server <- function(input, output) {
                    label = ~paste(sep = " ", "Distance travelled:",
                                   prettyNum(top_distance_operations$top_distance_df$distance_travelled,
                                             big.mark = ","),
-                                  "meters")
+                                  "meters"),
+                   labelOptions = labelOptions(noHide = T,
+                                               textsize = "15px")
       )
     
-    print("leaflet map")
-    print(class(top_distance_operations$map_leaftlet))
-  })
+    #print("leaflet map")
+    #print(class(top_distance_operations$map_leaftlet))
+  }) 
   
   # create map ---------------------------------------------
   output$reactive_leaflet_map <- renderLeaflet({
     my_map <- top_distance_operations$map_leaftlet
     my_map
-  })
+  })  %>%
+    bindCache(input$vesselSelect, top_distance_operations$map_leaftlet)  %>% 
+    bindEvent(top_distance_operations$map_leaftlet)
+  
   
 
 # value boxes -------------------------------------------------------------
 
   output$vesselname <- renderText({
     as.character(dropdown_data$vessel_name())
-  })
+  })  %>%
+    bindCache(dropdown_data$vessel_name())
   
+  
+
+# Dynamic texts -----------------------------------------------------------
+
+
+#* vessel flag -------------------------------------------------------------
+
+
   #should have used glue but time was ticking
-  output$ship_status <- renderText({
-    paste(sep = "<br>",
-          paste0("Vessel's flag: ", top_distance_operations$plot_df$FLAG[1]),
-          paste0("Vessel's Name: ", top_distance_operations$plot_df$ShipName[1]),
-          paste0("Distance travelled: ",top_distance_operations$top_record_df_distance$distance_travelled),
-          paste0("Destination: ", top_distance_operations$plot_df$DESTINATION[2]),
-          paste0("Port name: ", top_distance_operations$plot_df$port[2]),
-          paste0("starting datetime: ", top_distance_operations$top_record_df_distance$datetime_from),
-          paste0("ending datetime: ",top_distance_operations$top_record_df_distance$datetime_to),
-          paste0("Move from coords: ",
-                 "Lat: ", top_distance_operations$plot_df$LAT[1],
-                 " & ",
-                 "Lon: ", top_distance_operations$plot_df$LON[1]),
-          paste0("To coords: ",
-                 "Lat: ", top_distance_operations$plot_df$LAT[2],
-                 " & ",
-                 "Lon: ", top_distance_operations$plot_df$LON[2]),
-          paste0("Speed: ", 
-                 top_distance_operations$plot_df$SPEED[2], " knots")
-          )
-  })  
+  output$vesselflag <- renderText({
+    
+    paste0("Vessel's flag: ", top_distance_operations$plot_df$FLAG[1])
+    
+          
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$plot_df)
+  
+
+#* distance travelled ------------------------------------------------------
+
+  output$distancetravelled <- renderText({
+    
+    paste0("Distance travelled: ",top_distance_operations$top_distance_df$distance_travelled,
+           " mts")
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$top_distance_df)
+  
+  
+#* destination ------------------------------------------------------------
+
+  output$destination <- renderText({
+    
+    paste0("Destination: ", top_distance_operations$plot_df$DESTINATION[2])
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$plot_df)
+  
+  
+
+#* port ------------------------------------------------------------------
+
+  output$port <- renderText({
+    
+    paste0("Port name: ", top_distance_operations$plot_df$port[2])
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$plot_df)
+  
+  
+  
+  
+
+#* Starting date -----------------------------------------------------------
+
+  output$startdate <- renderText({
+    
+    paste0("starting datetime: ", top_distance_operations$top_distance_df$datetime_from)
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$top_distance_df)
+  
+  
+  
+#* ending date -------------------------------------------------------------
+
+  output$endingdate <- renderText({
+    
+    paste0("ending datetime: ",top_distance_operations$top_distance_df$datetime_to)
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$top_distance_df)
+  
+  
+
+
+#* parking status ----------------------------------------------------------
+
   
   output$parking_status <- renderText({
-    paste(sep = "<br>",
-          paste0("Is vessel parked? ",
-                 tags$b(
-                   if_else(top_distance_operations$plot_df$is_parked[1] == 1, "NO", "YES")
-                   )
-                 ),
-    paste0("In which week of the year: ", top_distance_operations$plot_df$week_of_year[1])
-    )
-  })
+    
+          paste0("Was ", dropdown_data$vessel_name(), " parked? ",
+                 
+                 if_else(top_distance_operations$plot_df$is_parked[1] == 1, "NO", "YES")
+                 
+                 )
+    
+  }) %>%
+    bindCache(dropdown_data$vessel_name(), top_distance_operations$plot_df)
+
+  
+
+#* week of year ------------------------------------------------------------
+
+  output$weekofyear <- renderText({
+    
+    paste0("In which week of the year?: ",
+           top_distance_operations$plot_df$week_of_year[2]
+    )     
+    
+    
+  }) %>%
+    bindCache(dropdown_data$vessel_name(), top_distance_operations$plot_df)
+  
+
+#* move from coords ----------------------------------------------------------
+
+  output$movefromcoords <- renderText({
+    
+    paste0("Move from coords: ",
+           "Lat: ", top_distance_operations$plot_df$LAT[1],
+           " & ",
+           "Lon: ", top_distance_operations$plot_df$LON[1])     
+    
+    
+  }) %>%
+    bindCache(dropdown_data$vessel_name(), top_distance_operations$plot_df)
+  
+
+#* move to coords ----------------------------------------------------------
+
+  output$movetocoords <- renderText({
+    
+    paste0("To coords: ",
+           "Lat: ", top_distance_operations$plot_df$LAT[2],
+           " & ",
+           "Lon: ", top_distance_operations$plot_df$LON[2])
+    
+    
+  }) %>%
+    bindCache(dropdown_data$vessel_name(), top_distance_operations$plot_df)
+  
+  
+
+#* Speed -------------------------------------------------------------------
+
+  output$speed <- renderText({
+    
+    paste0("Speed: ", 
+           top_distance_operations$plot_df$SPEED[2], " knots")
+    
+    
+  }) %>%
+    bindCache(dropdown_data$vessel_name(), top_distance_operations$plot_df)
+  
+    
+    
+      
   #output$output_map_module <- renderLeaflet({
    # my_map <- leaftlet_map_server("module_map",
     #                    dropdown_data = dropdown_data)
