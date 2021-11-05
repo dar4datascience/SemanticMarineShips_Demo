@@ -15,6 +15,7 @@ Imports:
     dtplyr,
     here,
     leaflet,
+    devtools,
     sf,
     shiny,
     shiny.semantic,
