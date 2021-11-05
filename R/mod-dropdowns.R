@@ -37,12 +37,11 @@ grid_selectors <- grid_template(default = list(
   areas = rbind(
     c(
       "vesseltype_selector",
-      "vesselname_selector",
-      "activate_search_button"
+      "vesselname_selector"
     )
   ),
   rows_height = c("100%"),
-  cols_width = c("40%", "40%", "20%")
+  cols_width = c("50%", "50%")
 ))
 
 # UI starts here ----------------------------------------------------------
@@ -61,7 +60,7 @@ ship_dropdowns_UI <- function(id) {
         choices = vessel_types,
         value = "Cargo - 7",
         default_text = "Select Vessel Type",
-        type = "search selection large"
+        type = "search selection big"
       ),
       
       # Dropdown select vessel --------------------------------------------------
@@ -70,14 +69,9 @@ ship_dropdowns_UI <- function(id) {
         choices = vessel_names,
         value = "KAROLI - 2764",
         default_text = 'Select a Vessel',
-        type = "search selection large"
-      ),
-      
-      # Activate logic button ---------------------------------------------------
-      activate_search_button = button(ns("search4vessel"),
-                                      "Find Vessel",
-                                      icon = icon("ship"))
-    ) # end of grid
+        type = "search selection big"
+      )
+      ) # end of grid
   ) # end of tagslists
 }
 
@@ -89,6 +83,7 @@ ship_dropdowns_UI <- function(id) {
 #' @return list with following components
 #' \describe{
 #'   \item{my_filtered_df}{reactive tibble used for performing calculation the create_distance_map_between_a_n_b function}
+#'   \item{vessel_name}{reactive character of vessel selected}
 #' }
 ship_dropdowns_server <- function(id) {
   moduleServer(id,
@@ -122,29 +117,27 @@ observe({
                  
                  vessel_df <- reactiveValues()
                  
-                 observeEvent(input$search4vessel,
+                 observeEvent(c(input$vesselType, input$vesselSelect),
                               {
                                 vessel_df$data <- filter_vessel_name(lazy_ship_data,
-                                                                     isolate(
                                                                        input$vesselSelect
-                                                                     )
-                                )
+                                                                      ) #end of function
+                                
+                                
+                                print(vessel_df$data %>% head())
                                 
                                 
                               })
                  
                  
-                 observeEvent(vessel_df$data,{
-                   print(vessel_df$data %>% head())
-                 })
-
 
 # return filtered df ------------------------------------------------------
 
                  
                  return(
                    list(
-                     my_filtered_data = reactive({ vessel_df$data })
+                     my_filtered_data = reactive({vessel_df$data}),
+                     vessel_name = reactive({input$vesselSelect})
                    )
                  )
                  

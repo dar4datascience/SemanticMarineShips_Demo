@@ -76,15 +76,16 @@ server <- function(input, output) {
 
 # call module servers -----------------------------------------------------
 
-  ship_dropdowns_server("conditional_dropdowns")
+  dropdown_data <- ship_dropdowns_server("conditional_dropdowns")
   # create map ---------------------------------------------
   output$reactive_leaflet_map <- renderLeaflet({
-    #my_map <- create_distance_map_between_a_n_b(data())
-    #my_map
+    my_map <- create_distance_map_between_a_n_b(dropdown_data$my_filtered_data())
+    my_map
   })
   
   observe({
-    print(input$vesselSelect)
+    print(dropdown_data$vessel_name())
+    print(head(dropdown_data$my_filtered_data()))
   })
   
 }
