@@ -4,6 +4,7 @@ source("R/func_2_spatial_df.R")
 source("R/func_2_calc_distances.R")
 source("R/func_get_max_distance.R")
 source("R/func_get_record_of_top_distance.R")
+library(testthat)
 
 test_that("2 records relating to max distance are returned", {
   

@@ -1,4 +1,6 @@
 source("R/func_load_data.R")
+library(testthat)
+
 test_that("loading ship df is correct and works", {
   
   loaded_data <- load_ship_data()

@@ -1,14 +1,28 @@
 
 # Call tools needed for app -----------------------------------------------
+library(shinyWidgets)
+library(shiny)
 library(dtplyr)
 library(dplyr)
-library(shiny)
+library(leaflet)
 library(shiny.semantic)
-
+source("R/func_load_data.R")
+source("R/func_filter_vessel_name.R")
+source("R/func_2_spatial_df.R")
+source("R/func_2_calc_distances.R")
+source("R/func_get_max_distance.R")
+source("R/func_get_record_of_top_distance.R")
+source("R/func_create_map.R")
 
 
 # Create useful variables -------------------------------------------------
+#* gridTemplate ------------------------------------------------------------
 
+grid_main_app <- grid_template(default = list(
+  areas = rbind(c("leaftlet_map")),
+  rows_height = c("100%"),
+  cols_width = c("100%")
+))
 
 # Define UI for application that draws a histogram
 ui <- semanticPage(
@@ -46,19 +60,32 @@ ui <- semanticPage(
                )
           )
         )
-      ) # end of cards segment
+      ), # end of cards segment
+  segment(
+    class = "basic",
+    tags$a(class = "ui blue right ribbon label right",
+           href = "https://www.marinetraffic.com/blog/information-transmitted-via-ais-signal/",
+           "Find my ship"),
+    leaflet::leafletOutput("reactive_leaflet_map")
+  )
     ) # end of main panel
 )
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
 
-  
-
 # call module servers -----------------------------------------------------
 
   ship_dropdowns_server("conditional_dropdowns")
+  # create map ---------------------------------------------
+  output$reactive_leaflet_map <- renderLeaflet({
+    #my_map <- create_distance_map_between_a_n_b(data())
+    #my_map
+  })
   
+  observe({
+    print(input$vesselSelect)
+  })
   
 }
 

@@ -43,7 +43,7 @@ df_ships <- fread(
 toc()
 
 #dont make a copy of the df when calling mutate
-lazy_df_ships <- lazy_dt(df_ships, immutable = FALSE)
+lazy_df_ships <- dtplyr::lazy_dt(df_ships, immutable = FALSE)
 ```
 
 Better to specify than not specify

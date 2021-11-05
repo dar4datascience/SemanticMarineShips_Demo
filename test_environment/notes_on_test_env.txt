@@ -1,0 +1,6 @@
+test_environment dir
+
+used for when no apparent error pops in the console yet the 
+shiny app still doesnt work.
+
+I move here the raw elements needed to try to parse out what went wrong

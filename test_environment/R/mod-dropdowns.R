@@ -88,7 +88,7 @@ ship_dropdowns_UI <- function(id) {
 #'
 #' @return list with following components
 #' \describe{
-#'   \item{my_filtered_df}{reactive tibble used for performing calculation the create_distance_map_between_a_n_b function}
+#'   \item{filtered_df}{reactive tibble used for performing calculation the create_distance_map_between_a_n_b function}
 #' }
 ship_dropdowns_server <- function(id) {
   moduleServer(id,
@@ -144,7 +144,7 @@ observe({
                  
                  return(
                    list(
-                     my_filtered_data = reactive({ vessel_df$data })
+                     filtered_df = reactive({ vessel_df$data })
                    )
                  )
                  
