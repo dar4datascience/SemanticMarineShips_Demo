@@ -1,17 +1,11 @@
-#' @description the module has 3 selectors when the 
-#' action button is pressed a calculation starts that
-#' filters the lazy ship df. The result is returned
-#' as a tibble for calculations and mapping
-
-# load libraries ----
-
-library(shiny)
-library(dplyr)
-library(dtplyr)
-library(shiny.semantic)
+#' Dropdown module 4 filtering vessels
+#' @description the module has 2 selectors and loads the needed 
+#' data for the filtering of the big data frame
 
 
-# data prep ---------------------------------------------------------------
+
+
+# HERE IS WHERE DATA IS LOADED ---------------------------------------------------------------
 
 #load ship names n types
 
@@ -45,6 +39,10 @@ grid_selectors <- grid_template(default = list(
 
 # UI starts here ----------------------------------------------------------
 
+#' ship_dropdowns_UI
+#' @description UI taglists for dynamic selectors
+#' @import shiny
+#' @export
 ship_dropdowns_UI <- function(id) {
   ns <- NS(id)
   tagList(
@@ -108,9 +106,9 @@ ship_dropdowns_server <- function(id) {
 
 # print selected vessel name to see on console ----------------------------
 
-observe({
-  print(input$vesselSelect)
-})
+#observe({
+ # print(input$vesselSelect)
+#})
 
  # Dataframe filtering -----------------------------------------------------
                  
@@ -123,7 +121,7 @@ observe({
                                                                       ) #end of function
                                 
                                 
-                                print(vessel_df$data %>% head())
+                                #print(vessel_df$data %>% head())
                                 
                                 
                               })
@@ -145,7 +143,12 @@ observe({
 
 
 dropdowns_demo <- function() {
-
+  # load libraries ----
+  
+  library(shiny)
+  library(dplyr)
+  library(dtplyr)
+  library(shiny.semantic)
 # app body ----------------------------------------------------------------
 
 

@@ -1,3 +1,7 @@
+#' get_max_distance
+#' @description function to obtain a single record regarding
+#' the most early longest consecutive distance
+#' @import dplyr
 #' @export
 get_max_distance <- function(df_distances) {
   if (colnames(df_distances)[3] != "distance_travelled") {

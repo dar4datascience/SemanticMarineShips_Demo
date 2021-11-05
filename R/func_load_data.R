@@ -1,5 +1,6 @@
+#' load_ship_data
+#' @description fread the heavy csv
 #' @importFrom data.table fread
-#' 
 #' @export
 load_ship_data <- function(){
   

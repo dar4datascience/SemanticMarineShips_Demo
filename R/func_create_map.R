@@ -1,5 +1,8 @@
-library(sf)
-library(leaflet)
+#' create_distance_map_between_a_n_b
+#' @description may function that calculates distances
+#' and displays results in a map
+#' @import sf
+#' @import leaflet
 #' @export
 create_distance_map_between_a_n_b <- function(filtered_df) {
   
@@ -55,7 +58,9 @@ create_distance_map_between_a_n_b <- function(filtered_df) {
                  label = ~paste(sep = " ", "Distance travelled:",
                                 prettyNum(top_distance_df$distance_travelled,
                                           big.mark = ","),
-                                "meters")
+                                "meters"),
+                 labelOptions = labelOptions(noHide = T,
+                                             textsize = "15px")
     )
  
  return(map_leaftlet)

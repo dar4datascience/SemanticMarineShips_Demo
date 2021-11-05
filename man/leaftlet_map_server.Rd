@@ -4,12 +4,12 @@
 \alias{leaftlet_map_server}
 \title{ship_dropdowns_server}
 \usage{
-leaftlet_map_server(id, filtered_df)
+leaftlet_map_server(id, dropdown_data)
 }
 \arguments{
-\item{filtered_df}{data frame (reactive) with variables necessary for leaflet map}
-
 \item{input, }{output, session standard \code{shiny} boilerplate}
+
+\item{filtered_df}{data frame (reactive) with variables necessary for leaflet map}
 }
 \value{
 list with following components

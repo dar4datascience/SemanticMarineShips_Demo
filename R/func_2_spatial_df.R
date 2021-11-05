@@ -1,4 +1,5 @@
-#transform data to spatial df to perform operations
+#' transform_to_spatial_df
+#' @description transform data to spatial df to perform operations
 #' @export
 transform_to_spatial_df <- function(df) {
   if (class(df)[1] != "tbl_df") {

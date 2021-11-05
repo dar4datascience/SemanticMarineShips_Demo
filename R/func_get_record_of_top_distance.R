@@ -1,3 +1,6 @@
+#' obtain_record_of_top_distance
+#' @description function to obtain a df with observations of 2
+#'  records initial point and movement to point
 #' @export
 obtain_record_of_top_distance <- function(filtered_df, top_distance){
   

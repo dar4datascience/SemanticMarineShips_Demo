@@ -4,7 +4,9 @@ func_distance <- function(from, to) {
   sf::st_distance(from, to, by_element = TRUE)
 }
 
-#calculate a new tibble after applied function
+#' calc_circle_distance
+#' @description a function that calculates the lead distances of vessel
+#' observations. calculate a new tibble after applied function
 #' @export
 calc_circle_distance <- function(spatial_df) {
   

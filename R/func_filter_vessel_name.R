@@ -1,3 +1,6 @@
+#' filter_vessel_name
+#' @description function to filter vessel records by name
+#' import dplyr
 #' @export
 filter_vessel_name <- function(df, vessel_name){
 

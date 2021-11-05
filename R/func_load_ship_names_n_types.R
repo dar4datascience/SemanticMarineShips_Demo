@@ -1,3 +1,5 @@
+#' load_ship_names_n_types
+#' @description load csv data for data selector dynamic filtering
 #' @importFrom data.table fread
 #' @export
 load_ship_names_n_types <- function(){
