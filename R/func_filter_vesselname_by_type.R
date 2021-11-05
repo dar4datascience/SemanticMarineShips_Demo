@@ -1,7 +1,6 @@
-#' @import dplyr
-#' @export
-library(dplyr)
 
+library(dplyr)
+#' @export
 filter_vessel_type <- function(df, vessel_type){
   
   filtered_df <- df %>% 

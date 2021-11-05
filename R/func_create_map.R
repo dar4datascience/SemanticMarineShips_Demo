@@ -1,5 +1,6 @@
 library(sf)
 library(leaflet)
+#' @export
 create_distance_map_between_a_n_b <- function(filtered_df) {
   
   if (nrow(filtered_df %>% distinct(ShipName)) > 1) {

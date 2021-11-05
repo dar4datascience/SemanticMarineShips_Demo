@@ -1,9 +1,11 @@
 #function distace to use
+
 func_distance <- function(from, to) {
   sf::st_distance(from, to, by_element = TRUE)
 }
 
 #calculate a new tibble after applied function
+#' @export
 calc_circle_distance <- function(spatial_df) {
   
   if (class(spatial_df)[1] != "sf") {

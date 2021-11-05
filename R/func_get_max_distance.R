@@ -1,3 +1,4 @@
+#' @export
 get_max_distance <- function(df_distances) {
   if (colnames(df_distances)[3] != "distance_travelled") {
     print("Column needed for operation missing. `distance travelled` is needed")

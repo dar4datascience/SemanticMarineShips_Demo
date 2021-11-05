@@ -1,3 +1,4 @@
+#' @export
 obtain_record_of_top_distance <- function(filtered_df, top_distance){
   
   if (colnames(top_distance)[1] != "datetime_from" &

@@ -1,4 +1,5 @@
 #transform data to spatial df to perform operations
+#' @export
 transform_to_spatial_df <- function(df) {
   if (class(df)[1] != "tbl_df") {
     print("object is not of class tbl_df. please make your df a tibble")
