@@ -9,8 +9,7 @@ library(shiny)
 library(dplyr)
 library(dtplyr)
 library(shiny.semantic)
-source("r/func_filter_vesselname_by_type.R")
-source("r/func_load_ship_names_n_types.R")
+
 
 # data prep ---------------------------------------------------------------
 
@@ -94,7 +93,7 @@ ship_dropdowns_server <- function(id) {
 
               
                  observeEvent(input$vesselType, {
-                   filtered_ship_names$data <- filter_vessel_type(ship_names_n_types,
+                   filtered_ship_names$data <- Demo_SemanticMarineShips::filter_vessel_type(ship_names_n_types,
                                                                   input$vesselType)
                     #print(filtered_ship_names$data %>% head())
                    
@@ -119,7 +118,7 @@ observe({
                  
                  observeEvent(c(input$vesselType, input$vesselSelect),
                               {
-                                vessel_df$data <- filter_vessel_name(lazy_ship_data,
+                                vessel_df$data <- Demo_SemanticMarineShips::filter_vessel_name(lazy_ship_data,
                                                                        input$vesselSelect
                                                                       ) #end of function
                                 

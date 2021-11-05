@@ -9,17 +9,10 @@ library(dtplyr)
 library(dplyr)
 library(leaflet)
 library(shiny.semantic)
-source("r/func_load_data.R")
-source("r/func_filter_vessel_name.R")
-source("r/func_2_spatial_df.R")
-source("r/func_2_calc_distances.R")
-source("r/func_get_max_distance.R")
-source("r/func_get_record_of_top_distance.R")
-source("r/func_create_map.R")
-# source modules
-source('r/mod-dropdowns.R')
-source('r/mod-leafletmap.R')
 
+
+#wrap to make a package
+SemanticMarineShips <- function(...) {
 
 # Create useful variables -------------------------------------------------
 #* gridTemplate ------------------------------------------------------------
@@ -108,3 +101,5 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
+
+}
