@@ -1,0 +1,52 @@
+---
+title: "Dealing with Problematic Vessels"
+date: "`r Sys.Date()`"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+here::i_am("reports/02ProblematicVessels.Rmd")
+source(here::here("R","func_load_data.R"))
+source(here::here("R","func_filter_vessel_name.R"))
+source(here::here("R","func_2_spatial_df.R"))
+source(here::here("R","func_2_calc_distances.R"))
+source(here::here("R","func_get_max_distance.R"))
+source(here::here("R","func_get_record_of_top_distance.R"))
+source(here::here("R","func_create_map.R"))
+library(dplyr)
+```
+
+```{r getdata}
+ship_data <- load_ship_data()
+```
+
+## get unique vessel names
+
+```{r getdistinctVesselNames}
+unique_ship_names <- ship_data %>% distinct(ShipName) %>% collect()
+```
+
+## check with one known trouble maker
+
+```{r firstTrouble}
+problematic_vessels <- c("35 - 2288508", "P9 HYDRO METEO - 850632")
+
+control_vessel <- "ORION - 347790"
+
+
+filter_35 <- filter_vessel_name(ship_data, problematic_vessels[1])
+
+#returns the last data value
+calculate_top_distance_35 <-  filter_35 %>%
+    transform_to_spatial_df(.) %>%
+    calc_circle_distance(.) %>%
+    #how to protect against same max distance? meaning 0
+    get_max_distance(.)
+  
+```
+
+`calculate_top_distance_35` reveals that the ship never moved so that explains why the function fails

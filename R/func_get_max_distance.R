@@ -4,8 +4,12 @@ get_max_distance <- function(df_distances) {
     
   } else{
     top_distance <- df_distances  %>%
+      #this returns multiple values if the same max distance
+      slice_max(order_by = distance_travelled) %>% 
       #HOW TO PROTECT AGAINST SAME DISTANCE AND GRAB THE MOST RECENT?
-      slice_max(order_by = distance_travelled)
+      arrange(desc(datetime_from)) %>% 
+      slice_head(n = 1)
+      
     
     return(top_distance)
   }

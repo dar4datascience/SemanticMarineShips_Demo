@@ -1,8 +1,10 @@
 ## Notes about app 
 
  - vessel name selector does not dropdown at the beginning. Might be still loading?
+ - vessel selector sometimes doesnt respont to clicks
  - use the box package for better function management
  - create more tests from shinytests
  - map doesnt display well in mobile, but minimap does. perhaps call base tile of world data
  - TESTs are weak and calling of functions maybe unneccesary
- - package the app as a package
+ - package the app as a package 
+ - is projection correct on the leaftlet? some observations appear on land, maybe the boat is on repairs
