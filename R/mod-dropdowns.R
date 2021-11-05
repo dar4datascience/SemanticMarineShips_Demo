@@ -9,8 +9,8 @@ library(shiny)
 library(dplyr)
 library(dtplyr)
 library(shiny.semantic)
-source("R/func_filter_vesselname_by_type.R")
-source("R/func_load_ship_names_n_types.R")
+source("r/func_filter_vesselname_by_type.R")
+source("r/func_load_ship_names_n_types.R")
 
 # data prep ---------------------------------------------------------------
 

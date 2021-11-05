@@ -10,13 +10,13 @@ output:
 ## Global options
 knitr::opts_chunk$set(cache = TRUE)
 here::i_am("reports/02ProblematicVessels.Rmd")
-source(here::here("R","func_load_data.R"))
-source(here::here("R","func_filter_vessel_name.R"))
-source(here::here("R","func_2_spatial_df.R"))
-source(here::here("R","func_2_calc_distances.R"))
-source(here::here("R","func_get_max_distance.R"))
-source(here::here("R","func_get_record_of_top_distance.R"))
-source(here::here("R","func_create_map.R"))
+source(here::here("r","func_load_data.R"))
+source(here::here("r","func_filter_vessel_name.R"))
+source(here::here("r","func_2_spatial_df.R"))
+source(here::here("r","func_2_calc_distances.R"))
+source(here::here("r","func_get_max_distance.R"))
+source(here::here("r","func_get_record_of_top_distance.R"))
+source(here::here("r","func_create_map.R"))
 library(dplyr)
 ```
 

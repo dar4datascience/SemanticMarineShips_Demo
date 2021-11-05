@@ -1,6 +1,5 @@
 
 # Call tools needed for app -----------------------------------------------
-library(shinyWidgets)
 library(shiny)
 library(sf)
 library(dtplyr)
