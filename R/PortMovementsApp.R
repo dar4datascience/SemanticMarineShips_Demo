@@ -7,6 +7,7 @@ library(waiter)
 library(shinycssloaders)
 library(dtplyr)
 library(dplyr)
+library(stringr)
 library(leaflet)
 library(shiny.semantic)
 
@@ -106,12 +107,7 @@ segment(
              div(class = "meta",
                  textOutput("vesselname")),
              div(class = "description",
-                 textOutput("vesselflag"),
-                 textOutput("distancetravelled"),
-                 textOutput("destination"),
-                 textOutput("port"),
-                 textOutput("startdate"),
-                 textOutput("endingdate")
+                 tags$p(verbatimTextOutput("vesselreport"))
                  )
          )
     ),
@@ -120,13 +116,10 @@ segment(
 
     card(class = "blue",
          div(class = "content",
-             div(class = "header", "Is the Vessel parked?"),
+             div(class = "header", "Was the Vessel parked?"),
              div(class = "description", 
-                 textOutput("parking_status"),
-                 textOutput("weekofyear"),
-                 textOutput("movefromcoords"),
-                 textOutput("movetocoords"),
-                 textOutput("speed")
+                 verbatimTextOutput("parkedreport")
+                 
                  )
          )
     )
@@ -156,6 +149,7 @@ server <- function(input, output) {
   top_distance_operations <- reactiveValues()
   
   observeEvent(dropdown_data$my_filtered_data(),{
+    print("filtered_data_changed")
     # perform distance calculations -------------------------------------------
     
     top_distance_operations$top_distance_df <- dropdown_data$my_filtered_data() %>%
@@ -184,11 +178,56 @@ server <- function(input, output) {
       arrange(DATETIME) %>% 
       mutate(
         position = c("Point A", "Point B")
+        
       )
     
     
     #print("plot df")
     #print(top_distance_operations$plot_df)
+
+# glue reports ------------------------------------------------------------
+
+
+    top_distance_operations$vesselreport <- stringr::str_glue("
+                                 Vessel's flag: {flag}
+                                 Max distance travelled: 
+                                          {distancetravelled} mts
+                                 Destination: {destination}
+                                 Speed: {speed} knots
+                                 Move from coords: Lat: {latfrom} 
+                                 & Lon: {lonfrom} 
+                                 Move to coords: Lat: {latto} 
+                                 & Lon: {lonto} ",
+                                 flag = top_distance_operations$plot_df$FLAG[1],
+                                 destination = top_distance_operations$plot_df$DESTINATION[2],
+                                 distancetravelled = top_distance_operations$top_distance_df[1],
+                                 latfrom = top_distance_operations$plot_df$LAT[1],
+                                 lonfrom = top_distance_operations$plot_df$LON[1],
+                                 latto = top_distance_operations$plot_df$LAT[2],
+                                 lonto = top_distance_operations$plot_df$LON[2],
+                                 speed = top_distance_operations$plot_df$SPEED[2]
+    )
+    
+    top_distance_operations$parkedreport <- stringr::str_glue("
+                                 Was {shipname} parked? {parkingstatus}
+                                 Port name: {port}
+                                 Starting datetime: 
+                                    {starttime} 
+                                 Ending datetime: 
+                                    {endingtime}
+                                 In which week of the year?: {weekofyear}",
+                                 port = top_distance_operations$plot_df$port[2],
+                                 starttime = top_distance_operations$top_distance_df$datetime_from[1],
+                                 endingtime = top_distance_operations$top_distance_df$datetime_to[1],
+                                 shipname = dropdown_data$vessel_name(),
+                                 parkingstatus = if_else(top_distance_operations$plot_df$is_parked[1] == 1, "NO", "YES"),
+                                 weekofyear = top_distance_operations$plot_df$week_of_year[2]
+                                 
+    )
+                                 
+    
+    print("description of vessel event")
+    print(top_distance_operations$vesselreport)
     
     # plot map ----------------------------------------------------------------
     
@@ -240,7 +279,29 @@ server <- function(input, output) {
 
 # Dynamic texts -----------------------------------------------------------
 
-
+  #* vessel report -------------------------------------------------------------
+  
+  
+  output$vesselreport <- renderPrint({
+    
+    top_distance_operations$vesselreport
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$vesselreport)
+ 
+  #* parking report -------------------------------------------------------------
+  
+  output$parkedreport <- renderPrint({
+    
+    top_distance_operations$parkedreport
+    
+    
+  })   %>%
+    bindCache(input$vesselSelect, top_distance_operations$parkedreport)
+  
+  
+  
 #* vessel flag -------------------------------------------------------------
 
 
