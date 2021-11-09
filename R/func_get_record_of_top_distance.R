@@ -15,7 +15,8 @@ obtain_record_of_top_distance <- function(filtered_df, top_distance){
     filtered_df %>% 
       filter(DATETIME == top_distance$datetime_from |
                DATETIME == top_distance$datetime_to)
-  ) 
+  ) %>% 
+    slice_head(n = 2)
   
   return(record_top_distance_points)
   }

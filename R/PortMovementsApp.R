@@ -159,8 +159,8 @@ server <- function(input, output) {
       get_max_distance(.)
     
     
-    #print("top distance operations")
-    #print(top_distance_operations$top_distance_df)
+    print("top distance")
+    print(top_distance_operations$top_distance_df)
     
     # obtain the records associated to max distance ------------------------------------------------------------------
     
@@ -169,8 +169,8 @@ server <- function(input, output) {
                                     top_distance_operations$top_distance_df)
     
     
-    #print("top distance df")
-    #print(top_distance_operations$top_record_df_distance)
+    print("top distance df")
+    print(top_distance_operations$top_record_df_distance)
     
     # add point reference -----------------------------------------------------
     
@@ -200,7 +200,7 @@ server <- function(input, output) {
                                  & Lon: {lonto} ",
                                  flag = top_distance_operations$plot_df$FLAG[1],
                                  destination = top_distance_operations$plot_df$DESTINATION[2],
-                                 distancetravelled = top_distance_operations$top_distance_df[1],
+                                 distancetravelled = top_distance_operations$top_distance_df$distance_travelled[1],
                                  latfrom = top_distance_operations$plot_df$LAT[1],
                                  lonfrom = top_distance_operations$plot_df$LON[1],
                                  latto = top_distance_operations$plot_df$LAT[2],
@@ -247,7 +247,7 @@ server <- function(input, output) {
       addMiniMap() %>% 
       addPolylines(~LON, ~LAT,
                    label = ~paste(sep = " ", "Distance travelled:",
-                                  prettyNum(top_distance_operations$top_distance_df$distance_travelled,
+                                  prettyNum(top_distance_operations$top_distance_df$distance_travelled[1],
                                             big.mark = ","),
                                   "meters"),
                    labelOptions = labelOptions(noHide = T,
